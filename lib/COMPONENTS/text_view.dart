@@ -6,7 +6,7 @@ class TextView extends StatefulWidget {
   const TextView({
     super.key,
     this.text = "Hello, Bagel!",
-    this.font = "jakarta",
+    this.font = "poppins",
     this.size = 14,
     this.color = Colors.black,
     this.isUnderlined = false,
