@@ -1,4 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_library/firebase_options.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_library/MODELS/constants.dart';
 import 'package:flutter_library/MODELS/firebase.dart';
@@ -47,6 +50,14 @@ class DataMaster {
   DataMaster();
 
   // FUNCTIONS
+  void getStarted() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await dotenv.load(fileName: "lib/.env");
+  }
+
   Future<bool> checkUser(String table) async {
     final user = await auth_CheckUser();
     print(user);
@@ -83,7 +94,8 @@ class DataMaster {
 
   void alertMissingInfo() {
     setAlertTitle('Missing Info');
-    setAlertText('Please fill out all fields with the appropriate information.');
+    setAlertText(
+        'Please fill out all fields with the appropriate information.');
     setToggleAlert(true);
   }
 }
