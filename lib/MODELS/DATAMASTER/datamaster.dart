@@ -7,6 +7,7 @@ import 'package:flutter_library/MODELS/constants.dart';
 import 'package:flutter_library/MODELS/firebase.dart';
 
 class DataMaster {
+  String _theAppName = '';
   // Toggles
   bool _toggleLoading = false;
   bool _toggleAlert = false;
@@ -26,9 +27,11 @@ class DataMaster {
 
   String get alertTitle => _alertTitle;
   String get alertText => _alertText;
+  String get theAppName => _theAppName;
 
   void setAlertTitle(String value) => _alertTitle = value;
   void setAlertText(String value) => _alertText = value;
+  void setTheAppName(String value) => _theAppName = value;
 
   // Lists
   List<Widget> _alertButtons = [];
@@ -62,11 +65,12 @@ class DataMaster {
     final user = await auth_CheckUser();
     print(user);
     if (user != null) {
-      var userDoc = await firebase_GetDocument('${appName}_$table', user.uid);
+      var userDoc =
+          await firebase_GetDocument('${theAppName}_$table', user.uid);
       if (userDoc.isNotEmpty) {
         final token = await messaging_SetUp();
         final success = await firebase_UpdateDocument(
-            '${appName}_$table', userDoc['id'], {'token': token});
+            '${theAppName}_$table', userDoc['id'], {'token': token});
         if (success) {
           userDoc = {...userDoc, 'token': token};
         }

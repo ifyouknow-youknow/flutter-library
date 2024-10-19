@@ -29,7 +29,7 @@ Future<User?> auth_CreateUser(String email, String password) async {
 //SIGN IN
 Future<User?> auth_SignIn(String email, String password, String table) async {
   try {
-    final docs = await firebase_GetAllDocumentsQueried('${appName}_$table', [
+    final docs = await firebase_GetAllDocumentsQueried('${theAppName}_$table', [
       {'field': 'email', 'operator': '==', 'value': email}
     ]);
     if (docs.isNotEmpty) {
