@@ -62,6 +62,7 @@ class DataMaster {
   }
 
   Future<bool> checkUser(String table) async {
+    print(theAppName);
     final user = await auth_CheckUser();
     print(user);
     if (user != null) {
