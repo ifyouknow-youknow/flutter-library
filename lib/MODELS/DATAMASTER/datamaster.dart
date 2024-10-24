@@ -67,7 +67,7 @@ class DataMaster {
     print(user);
     if (user != null) {
       var userDoc =
-          await firebase_GetDocument('${theAppName}_$table', user.uid);
+          await firebase_GetDocument('$table', user.uid);
       if (userDoc.isNotEmpty) {
         final token = await messaging_SetUp();
         final success = await firebase_UpdateDocument(
