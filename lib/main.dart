@@ -1,10 +1,18 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_library/COMPONENTS/button_view.dart';
 import 'package:flutter_library/COMPONENTS/text_view.dart';
 import 'package:flutter_library/MODELS/DATAMASTER/datamaster.dart';
 import 'package:flutter_library/MODELS/coco.dart';
+import 'package:flutter_library/firebase_options.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await dotenv.load(fileName: "lib/.env");
   final dm = DataMaster();
   dm.getStarted();
   runApp(const flutter_library());
