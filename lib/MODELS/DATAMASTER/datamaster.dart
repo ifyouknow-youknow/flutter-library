@@ -53,7 +53,7 @@ class DataMaster {
   DataMaster();
 
   // FUNCTIONS
-  void getStarted() async {
+  Future<void> getStarted() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
