@@ -701,66 +701,68 @@ Future<bool> storage_UploadMedia(String path, File file) async {
 // SET UP
 
 Future<String?> messaging_SetUp() async {
-  // Request notification permissions
-  NotificationSettings settings =
-      await FirebaseMessaging.instance.requestPermission();
+  try {
+    // Request notification permissions
+    NotificationSettings settings = await messaging.requestPermission();
 
-  // Check if permission is granted or not
-  if (settings.authorizationStatus == AuthorizationStatus.denied ||
-      settings.authorizationStatus == AuthorizationStatus.notDetermined) {
-    print('Notification permission not granted. Asking again...');
+    if (settings.authorizationStatus == AuthorizationStatus.denied ||
+        settings.authorizationStatus == AuthorizationStatus.notDetermined) {
+      print('Notification permission not granted. Asking again...');
+      settings = await messaging.requestPermission();
+    }
 
-    // Request permission again
-    settings = await FirebaseMessaging.instance.requestPermission();
-  }
+    if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+        settings.authorizationStatus == AuthorizationStatus.provisional) {
+      print('Notification permission granted.');
 
-  // Check again after re-requesting permissions
-  if (settings.authorizationStatus == AuthorizationStatus.authorized ||
-      settings.authorizationStatus == AuthorizationStatus.provisional) {
-    print('Notification permission granted.');
+      // Fetch the APNS token (for iOS)
+      await fetchAPNSToken();
 
-    // Fetch the APNS token (for iOS)
-    fetchAPNSToken();
+      // Fetch the device token
+      String? token = await messaging.getToken();
+      print("Device Token: $token");
 
-    // Fetch the device token
-    String? token = await FirebaseMessaging.instance.getToken();
-    print("Device Token: $token");
+      // Set up foreground message handler
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print('Message received in foreground: ${message.messageId}');
+        // Handle foreground message
+      });
 
-    // Set up foreground message handler
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Message received in foreground: ${message.messageId}');
-      // Handle foreground message
-    });
+      // Set up background message handler
+      FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
 
-    // Set up background message handler
-    FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+      // Handle notification when the app is launched from a notification
+      messaging.getInitialMessage().then((RemoteMessage? message) {
+        if (message != null) {
+          print('App launched from notification: ${message.messageId}');
+          // Handle notification tap
+        }
+      });
 
-    // Handle notification when the app is launched from a notification
-    FirebaseMessaging.instance
-        .getInitialMessage()
-        .then((RemoteMessage? message) {
-      if (message != null) {
-        print('App launched from notification: ${message.messageId}');
-        // Handle notification tap
-      }
-    });
-
-    return token;
-  } else {
-    print('Notification permission denied.');
-    return null; // No token if permission is denied
+      return token;
+    } else {
+      print('Notification permission denied.');
+      return null; // No token if permission is denied
+    }
+  } catch (e) {
+    print("Error during messaging setup: $e");
+    return null;
   }
 }
 
 Future<void> messaging_IosSetUp() async {
-  await messaging.setForegroundNotificationPresentationOptions(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-  messaging.getInitialMessage().then(handleMessage);
-  FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
-  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+  try {
+    await messaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    messaging.getInitialMessage().then(handleMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
+    FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+  } catch (e) {
+    print("Error during iOS messaging setup: $e");
+  }
 }
 
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
@@ -770,17 +772,25 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
 }
 
 void handleMessage(RemoteMessage? message) {
-  if (message == null) {
-    return;
-  }
+  if (message == null) return;
+  print('Notification received: ${message.messageId}');
 }
 
 Future<void> fetchAPNSToken() async {
-  final token = await messaging.getAPNSToken();
-  print('APNS Token: $token');
+  try {
+    final token = await messaging.getAPNSToken();
+    print('APNS Token: $token');
+  } catch (e) {
+    print("Error fetching APNS token: $e");
+  }
 }
 
-Future<void> sendPushNotification(token, title, message) async {
-  server_POST('send-notification',
-      {'token': token, 'title': '$title', 'message': '$message'});
+Future<void> sendPushNotification(
+    String token, String title, String message) async {
+  try {
+    await server_POST('send-notification',
+        {'token': token, 'title': title, 'message': message});
+  } catch (e) {
+    print("Error sending push notification: $e");
+  }
 }
