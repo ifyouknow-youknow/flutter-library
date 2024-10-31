@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_library/COMPONENTS/blur_view.dart';
+import 'package:flutter_library/COMPONENTS/padding_view.dart';
 import 'package:flutter_library/COMPONENTS/text_view.dart';
 
 class LoadingView extends StatelessWidget {
@@ -14,22 +15,24 @@ class LoadingView extends StatelessWidget {
         intensity: 3,
         color: Color.fromARGB(183, 20, 19, 19),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextView(
-                text: "One moment please...",
-                color: Colors.white,
-                size: 16,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              CircularProgressIndicator(
-                strokeWidth: 2,
-                color: Colors.white,
-              ),
-            ],
+          child: PaddingView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextView(
+                  text: "One moment please...",
+                  color: Colors.white,
+                  size: 16,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              ],
+            ),
           ),
         ),
       ),
