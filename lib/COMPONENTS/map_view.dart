@@ -40,19 +40,6 @@ class _MapViewState extends State<MapView> {
   TextEditingController _searchController = TextEditingController();
   Set<Marker> _markers = {};
 
-  @override
-  void initState() {
-    super.initState();
-    _checkLocationPermission();
-  }
-
-  Future<void> _checkLocationPermission() async {
-    if (await Permission.locationWhenInUse.request().isGranted) {
-      print("Location permission granted");
-    } else {
-      print("Location permission denied");
-    }
-  }
 
   void _addMarkers() {
     Set<Marker> markers = widget.locations.map((location) {
